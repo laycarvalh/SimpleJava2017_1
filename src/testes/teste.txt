@@ -1,0 +1,16 @@
+Prog exemplo{
+Int numero;
+Int fatorial (Int fat){
+if (fat > 1){
+return(fat * fatorial(fat-1));
+} else {
+return(1);
+}
+}
+Bool resultado(Int valor){
+print("Resultado: ", valor);
+return(TRUE);
+}
+scan(numero);
+resultado(fatorial(numero));
+}
