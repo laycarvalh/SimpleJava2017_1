@@ -6,6 +6,17 @@
 
 package simplejava2017_1;
 
+import excecoes.SyntaxError;
+import gramatica.ErroSintaticoListener;
+import gramatica.GramaticaSimpleJavaLexer;
+import gramatica.GramaticaSimpleJavaParser;
+import javax.swing.text.BadLocationException;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import sistema.Semantica;
+import sistema.SimpleJavaVisitor;
+
 /**
  *
  * @author layca
@@ -99,7 +110,39 @@ public class IDE extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompilarActionPerformed
-        // TODO add your handling code here:
+        textSaidaErro.setText("");
+	ANTLRInputStream antlrInput = new ANTLRInputStream(textEditor.getText());
+	GramaticaSimpleJavaLexer lexer = new GramaticaSimpleJavaLexer(antlrInput);
+	CommonTokenStream tokens = new CommonTokenStream(lexer);
+	GramaticaSimpleJavaParser parser = new GramaticaSimpleJavaParser(tokens);
+        parser.removeErrorListeners();
+	ErroSintaticoListener errorCollector = new ErroSintaticoListener();
+	parser.addErrorListener(errorCollector);
+	System.out.println(errorCollector.getErrors().size());
+        
+        ParseTree	tree = parser.prog();
+				
+	SimpleJavaVisitor loader = new SimpleJavaVisitor();
+	loader.visit(tree);
+	
+        if(errorCollector.getErrors().size() > 0){
+            for (int i = 0 ;i < errorCollector.getErrors().size() ; i++) {
+		SyntaxError e =  errorCollector.getErrors().get(i);
+		// RecognitionExceptionUtil is my custom class discussed next.
+		System.out.println("######################");
+                int start = e.getOffendingToken().getStartIndex();
+		int stop = e.getOffendingToken().getStopIndex() + 1;
+		String input = e.getOffendingToken().getTokenSource().getInputStream().toString();
+						
+		int p0 = textEditor.getText().indexOf(input);
+		int p1 = p0 + input.length();
+						
+                textSaidaErro.append("Erro "+(i+1)+": Linha "+e.getLine()+" : "+e.getMessage()+"\n");					
+            }	
+	}
+        
+        
+        
     }//GEN-LAST:event_btnCompilarActionPerformed
 
     /**
