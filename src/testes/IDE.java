@@ -129,7 +129,9 @@ public class IDE extends javax.swing.JFrame {
 						
                 textSaidaErro.append("Erro "+(i+1)+": Linha "+e.getLine()+" : "+e.getMessage()+"\n");					
             }	
-	}
+	}else{
+            textSaidaErro.append("Sucesso na Compilação\n");    
+        }
         
         
         
